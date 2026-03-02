@@ -1,0 +1,105 @@
+name: Build Android
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  buildAndroid:
+    runs-on: ubuntu-latest
+    
+    steps:
+      # ──────────────────────────────────────────────
+      # 1. Checkout do repositório
+      # ──────────────────────────────────────────────
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # ──────────────────────────────────────────────
+      # 2. Configurar Java 11 (necessário para Android SDK/Gradle)
+      # ──────────────────────────────────────────────
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "11"
+
+      # ──────────────────────────────────────────────
+      # 3. Configurar Haxe 4.2.4 (versão exigida pelo projeto)
+      # ──────────────────────────────────────────────
+      - name: Setup Haxe
+        uses: krdlab/setup-haxe@master
+        with:
+          haxe-version: 4.2.4
+
+      # ──────────────────────────────────────────────
+      # 4. Instalar todas as haxelibs necessárias
+      # ──────────────────────────────────────────────
+      - name: Install Haxelib Dependencies
+        run: |
+          haxelib setup ~/haxelib
+
+          # Core
+          haxelib install hxcpp --quiet
+          haxelib install lime --quiet
+          haxelib install openfl --quiet
+
+          # HaxeFlixel
+          haxelib install flixel --quiet
+          haxelib run lime setup flixel
+          haxelib install flixel-tools --quiet
+          haxelib install flixel-ui --quiet
+          haxelib install flixel-addons --quiet
+
+          # Utilidades JSON / Script
+          haxelib install tjson --quiet
+          haxelib install hxjsonast --quiet
+          haxelib install hscript --quiet
+
+          # Vídeo (hxCodec — VIDEOS_ALLOWED)
+          haxelib install hxCodec --quiet
+
+          # LuaJIT (nebulazorua — conforme README do projeto)
+          haxelib git linc_luajit https://github.com/nebulazorua/linc_luajit --quiet
+
+          # Android Tools (suporte mobile)
+          haxelib git extension-androidtools https://github.com/jigsaw-4277821/extension-androidtools --quiet
+
+          haxelib list
+
+      # ──────────────────────────────────────────────
+      # 5. Configurar o Lime para uso geral
+      # ──────────────────────────────────────────────
+      - name: Setup Lime
+        run: haxelib run lime setup -alias -y
+
+      # ──────────────────────────────────────────────
+      # 6. Configurar o Android SDK/NDK para o Lime
+      # ──────────────────────────────────────────────
+      - name: Configure Android SDK & NDK
+        run: |
+          haxelib run lime config ANDROID_SDK $ANDROID_SDK_ROOT
+          haxelib run lime config ANDROID_NDK_ROOT $ANDROID_NDK_ROOT
+          haxelib run lime config JAVA_HOME $JAVA_HOME
+          haxelib run lime config ANDROID_SETUP true
+
+      # ──────────────────────────────────────────────
+      # 7. Compilar para Android (release final)
+      # ──────────────────────────────────────────────
+      - name: Build Android APK
+        run: haxelib run lime build android -final
+
+      # ──────────────────────────────────────────────
+      # 8. Fazer upload do APK como artefato da Action
+      # ──────────────────────────────────────────────
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: BrenninhoEngine-Android
+          path: export/release/android/bin/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
