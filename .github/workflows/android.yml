@@ -1,4 +1,4 @@
-name: Build Android Debug
+name: Build Android
 
 on:
   push:
@@ -23,11 +23,9 @@ jobs:
         with:
           haxe-version: 4.3.6
 
-      - name: Install Dependencies
+      - name: Install Libs
         run: |
           haxelib setup ~/haxelib
-          
-          # Bibliotecas básicas
           haxelib install hxcpp
           haxelib install lime
           haxelib install openfl
@@ -36,17 +34,11 @@ jobs:
           haxelib install flixel-ui
           haxelib install hxCodec
           haxelib install hscript
-          
-          # LuaJIT
           haxelib git linc_luajit https://github.com/nebulazorua/linc_luajit
-          
-          # Android Tools (CORRIGIDO)
-          haxelib remove extension-androidtools
           haxelib git extension-androidtools https://github.com/jigsaw-4277821/extension-androidtools
 
       - name: Setup Android
         run: |
-          haxelib run lime setup
           haxelib run lime setup android -y
           haxelib run lime config ANDROID_SDK $ANDROID_SDK_ROOT
           haxelib run lime config ANDROID_NDK_ROOT $ANDROID_NDK_ROOT
@@ -56,8 +48,7 @@ jobs:
 
       - name: Rename APK
         run: |
-          APK=$(find export -name "*.apk" | head -1)
-          cp "$APK" BrenninhoEngine.apk
+          cp $(find export -name "*.apk" | head -1) BrenninhoEngine.apk
 
       - uses: actions/upload-artifact@v4
         with:
