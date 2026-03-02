@@ -1,4 +1,4 @@
-name: Build Android Debug
+name: Build Android
 
 on:
   push:
@@ -35,14 +35,16 @@ jobs:
           haxelib install hscript
           haxelib git linc_luajit https://github.com/nebulazorua/linc_luajit
 
+      - name: Setup Android
+        run: haxelib run lime setup android -y
+
       - name: Build APK
         run: haxelib run lime build android
 
-      - name: Rename and Upload APK
+      - name: Rename APK
         run: |
           APK=$(find export -name "*.apk" | head -1)
           cp "$APK" BrenninhoEngine.apk
-        continue-on-error: false
 
       - uses: actions/upload-artifact@v4
         with:
