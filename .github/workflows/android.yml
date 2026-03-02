@@ -12,7 +12,7 @@ on:
 jobs:
   buildAndroid:
     runs-on: ubuntu-latest
-    
+
     steps:
       # ──────────────────────────────────────────────
       # 1. Checkout do repositório
@@ -30,12 +30,12 @@ jobs:
           java-version: "11"
 
       # ──────────────────────────────────────────────
-      # 3. Configurar Haxe 4.2.4 (versão exigida pelo projeto)
+      # 3. Configurar Haxe 4.3.6 (flixel 6.x exige 4.2.5+)
       # ──────────────────────────────────────────────
       - name: Setup Haxe
         uses: krdlab/setup-haxe@master
         with:
-          haxe-version: 4.2.4
+          haxe-version: 4.3.6  # FIX: era 4.2.4, flixel 6.1.2 exige 4.2.5+
 
       # ──────────────────────────────────────────────
       # 4. Instalar todas as haxelibs necessárias
@@ -101,5 +101,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: BrenninhoEngine-Android
-          path: export/release/android/bin/app/build/outputs/apk/debug/*.apk
+          path: export/release/android/bin/app/build/outputs/apk/release/*.apk  # FIX: era /debug/, -final gera em /release/
           if-no-files-found: error
