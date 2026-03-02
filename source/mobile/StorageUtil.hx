@@ -50,15 +50,15 @@ class StorageUtil
     #if sys
     // root directory, used for handling the saved storage type and path
     public static final rootDir:String = LimeSystem.applicationStorageDirectory;
-    
+
     // Valores padrão para evitar referências não encontradas
     private static var packageName:String = "me.funkin.brenninhoengine";
     private static var fileLocal:String = "BrenninhoEngine";
-    
+
     public static function getStorageDirectory(?force:Bool = false):String
     {
         var daPath:String = '';
-        
+
         #if android
         // Inicializa valores do Lime se disponível
         try {
@@ -70,7 +70,7 @@ class StorageUtil
         } catch(e:Dynamic) {
             // Usa valores padrão se falhar
         }
-        
+
         // Verifica se ClientPrefs existe, caso contrário usa valor padrão
         var storageType:String = "EXTERNAL";
         try {
@@ -88,10 +88,10 @@ class StorageUtil
         } catch(e:Dynamic) {
             // Se falhar ao ler/escrever, continua com valor padrão
         }
-        
+
         daPath = force ? StorageType.fromStrForce(storageType) : StorageType.fromStr(storageType);
         daPath = Path.addTrailingSlash(daPath);
-        
+
         #elseif ios
         daPath = LimeSystem.documentsDirectory;
         #else
@@ -109,7 +109,7 @@ class StorageUtil
                 FileSystem.createDirectory('saves');
 
             File.saveContent('saves/$fileName', fileData);
-            
+
             #if (android && !macro)
             if (alert)
                 showPopUp('$fileName has been saved.', "Success!");
@@ -129,7 +129,7 @@ class StorageUtil
             #end
         }
     }
-    
+
     // Método auxiliar para mostrar pop-up (evita dependência direta do CoolUtil)
     private static function showPopUp(message:String, title:String):Void
     {
@@ -181,18 +181,18 @@ class StorageUtil
     public static function checkExternalPaths(?splitStorage = false):Array<String>
     {
         var paths:Array<String> = [];
-        
+
         #if android
         try {
             var process = new sys.io.Process('grep -o "/storage/....-...." /proc/mounts');
             var output = process.stdout.readAll().toString();
             process.close();
-            
+
             paths = output.split('\n');
-            
+
             // Remove strings vazias
             paths = paths.filter(function(p) return p != "");
-            
+
             if (splitStorage) {
                 paths = paths.map(function(p) return p.replace('/storage/', ''));
             }
@@ -200,14 +200,14 @@ class StorageUtil
             trace('Error checking external paths: $e');
         }
         #end
-        
+
         return paths;
     }
 
     public static function getExternalDirectory(externalDir:String):String
     {
         var daPath:String = '';
-        
+
         #if android
         for (path in checkExternalPaths(false))
         {
@@ -223,7 +223,7 @@ class StorageUtil
             daPath = Path.addTrailingSlash(daPath);
         }
         #end
-        
+
         return daPath;
     }
     #end
@@ -256,7 +256,7 @@ enum abstract StorageType(String) from String to String
         } catch(e:Dynamic) {}
 
         var result:String = '';
-        
+
         try {
             result = switch (str)
             {
@@ -270,7 +270,7 @@ enum abstract StorageType(String) from String to String
             // Fallback para caminhos forçados em caso de erro
             result = fromStrForce(str);
         }
-        
+
         return result;
     }
 
@@ -290,7 +290,7 @@ enum abstract StorageType(String) from String to String
             default: forcedPath + '.' + fileLocal;
         }
     }
-    
+
     public static function getAvailableTypes():Array<String>
     {
         return ["EXTERNAL_DATA", "EXTERNAL_OBB", "EXTERNAL_MEDIA", "EXTERNAL"];
