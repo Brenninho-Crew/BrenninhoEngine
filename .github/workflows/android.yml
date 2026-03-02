@@ -26,6 +26,9 @@ jobs:
       - name: Install Dependencies
         run: |
           haxelib setup ~/haxelib
+          
+          # Bibliotecas básicas
+          haxelib install hxcpp
           haxelib install lime
           haxelib install openfl
           haxelib install flixel
@@ -33,21 +36,20 @@ jobs:
           haxelib install flixel-ui
           haxelib install hxCodec
           haxelib install hscript
-          haxelib git linc_luajit https://github.com/nebulazorua/linc_luajit
-
-      - name: Setup Android SDK
-        run: |
-          # Configurar ANDROID_SDK_ROOT
-          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
-          echo "ANDROID_NDK_ROOT=$ANDROID_NDK_ROOT" >> $GITHUB_ENV
           
-          # Configurar no Lime
+          # LuaJIT
+          haxelib git linc_luajit https://github.com/nebulazorua/linc_luajit
+          
+          # Android Tools (CORRIGIDO)
+          haxelib remove extension-androidtools
+          haxelib git extension-androidtools https://github.com/jigsaw-4277821/extension-androidtools
+
+      - name: Setup Android
+        run: |
+          haxelib run lime setup
+          haxelib run lime setup android -y
           haxelib run lime config ANDROID_SDK $ANDROID_SDK_ROOT
           haxelib run lime config ANDROID_NDK_ROOT $ANDROID_NDK_ROOT
-          haxelib run lime config JAVA_HOME $JAVA_HOME
-          
-          # Setup Android
-          haxelib run lime setup android -y
 
       - name: Build APK
         run: haxelib run lime build android
