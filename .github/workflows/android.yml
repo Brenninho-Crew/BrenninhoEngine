@@ -8,7 +8,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v4
 
@@ -26,29 +26,30 @@ jobs:
       - name: Install Libs
         run: |
           haxelib setup ~/haxelib
-          haxelib install hxcpp
-          haxelib install lime
-          haxelib install openfl
-          haxelib install flixel
-          haxelib install flixel-addons
-          haxelib install flixel-ui
-          haxelib install hxCodec
-          haxelib install hscript
-          haxelib git linc_luajit https://github.com/nebulazorua/linc_luajit
-          haxelib git extension-androidtools https://github.com/jigsaw-4277821/extension-androidtools
+          haxelib install hxcpp 4.3.2       --quiet
+          haxelib install lime              --quiet
+          haxelib install openfl            --quiet
+          haxelib install flixel 4.11.0     --quiet  # FIX: 5.x removeu FlxSoundGroup
+          haxelib install flixel-addons     --quiet
+          haxelib install flixel-ui         --quiet
+          haxelib install hscript           --quiet
+          haxelib git linc_luajit           https://github.com/nebulazorua/linc_luajit
+          haxelib git hxCodec               https://github.com/polybiusproxy/hxCodec
+          haxelib git extension-androidtools https://github.com/MaysLastPlay77/extension-androidtools  # FIX: repo correto
 
-      - name: Setup Android
+      - name: Setup Android SDK/NDK
         run: |
           haxelib run lime setup android -y
           haxelib run lime config ANDROID_SDK $ANDROID_SDK_ROOT
           haxelib run lime config ANDROID_NDK_ROOT $ANDROID_NDK_ROOT
+          haxelib run lime config ANDROID_BUILD_TOOLS_VERSION "33.0.1"
+          haxelib run lime config ANDROID_TARGET_SDK_VERSION "33"
 
       - name: Build APK
-        run: haxelib run lime build android
+        run: haxelib run lime build android -final
 
       - name: Rename APK
-        run: |
-          cp $(find export -name "*.apk" | head -1) BrenninhoEngine.apk
+        run: cp $(find export -name "*.apk" | head -1) BrenninhoEngine.apk
 
       - uses: actions/upload-artifact@v4
         with:
