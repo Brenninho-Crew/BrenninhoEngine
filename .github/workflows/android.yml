@@ -26,16 +26,19 @@ jobs:
       - name: Install Libs
         run: |
           haxelib setup ~/haxelib
-          haxelib install hxcpp 4.3.2       --quiet
-          haxelib install lime              --quiet
-          haxelib install openfl            --quiet
-          haxelib install flixel 4.11.0     --quiet  # FIX: 5.x removeu FlxSoundGroup
-          haxelib install flixel-addons     --quiet
-          haxelib install flixel-ui         --quiet
-          haxelib install hscript           --quiet
-          haxelib git linc_luajit           https://github.com/nebulazorua/linc_luajit
-          haxelib git hxCodec               https://github.com/polybiusproxy/hxCodec
-          haxelib git extension-androidtools https://github.com/MaysLastPlay77/extension-androidtools  # FIX: repo correto
+          haxelib install hxcpp 4.3.2          --quiet
+          haxelib install lime                 --quiet
+          haxelib install openfl               --quiet
+          haxelib install flixel 4.11.0        --quiet  # FIX: 5.x removeu FlxSoundGroup
+          haxelib install flixel-addons 2.11.0 --quiet  # FIX: 4.x só é compatível com flixel 5.3+
+          haxelib install flixel-ui 2.6.1      --quiet  # FIX: compatível com flixel 4.x
+          haxelib install hscript              --quiet
+          haxelib git linc_luajit            https://github.com/nebulazorua/linc_luajit
+          haxelib git hxCodec                https://github.com/polybiusproxy/hxCodec
+          haxelib git extension-androidtools https://github.com/MAJigsaw77/extension-androidtools  # FIX: repo canônico
+
+      - name: Debug haxelib list
+        run: haxelib list
 
       - name: Setup Android SDK/NDK
         run: |
